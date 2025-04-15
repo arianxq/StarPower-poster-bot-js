@@ -8,7 +8,7 @@ const path = require("path");
  */
 async function generateHtmlPoster(data) {
   const templatePath = path.resolve("render/poster-template.html");
-  const outputPath = path.resolve("../render/generated.html");
+  const outputPath = path.resolve(__dirname, "../render/generated.html");
 
   // 确保 /tmp/render 目录存在（用于 Lambda）
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
