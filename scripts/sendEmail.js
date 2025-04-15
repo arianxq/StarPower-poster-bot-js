@@ -28,7 +28,15 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") 
     from: `"StarPower Media" <${senderEmail}>`,
     to: to,
     subject: `Your ${reportType} TikTok Report 🌟`,
-    text: `Hey ${username},\n\nHere's your ${reportType.toLowerCase()} performance poster. Please keep it up!\n\n— StarPower Team`,
+    text: `Hi ${username},
+  
+  Please see your last ${reportType.toLowerCase()}'s performance and progress in the attachment.
+  
+  Keep up the great work. We’re always very proud of you and what you have achieved.
+  
+  If you ever need support or clarification, don’t hesitate to reach out to your manager anytime.
+  
+  StarPower Media Creator Support 🥰`,
     attachments: [
       {
         filename: `${username.replace(/[^\w\-]/g, "_")}.png`,
@@ -36,6 +44,10 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") 
       },
     ],
   };
+  
+  
+  
+  
 
   try {
     await transporter.sendMail(mailOptions);

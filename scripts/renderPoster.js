@@ -7,7 +7,7 @@ const fs = require("fs");
   try {
     const outputName = process.argv[2] || "poster-output.png";
 
-    const htmlPath = path.resolve("/tmp/render/generated.html");
+    const htmlPath = path.resolve("./render/generated.html");
     const outputDir = path.resolve("/tmp/output");
     const outputPath = path.join(outputDir, outputName);
 
