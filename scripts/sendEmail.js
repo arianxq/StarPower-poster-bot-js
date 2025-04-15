@@ -24,13 +24,14 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") 
     },
   });
 
+  const periodWord = reportType.toLowerCase() === "weekly" ? "week" : "month";
   const mailOptions = {
     from: `"StarPower Media" <${senderEmail}>`,
     to: to,
     subject: `Your ${reportType} TikTok Report 🌟`,
     text: `Hi ${username},
   
-  Please see your last ${reportType.toLowerCase()}'s performance and progress in the attachment.
+  Please see your last ${periodWord}'s performance and progress in the attachment.
   
   Keep up the great work. We’re always very proud of you and what you have achieved.
   
