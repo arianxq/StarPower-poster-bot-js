@@ -1,0 +1,22 @@
+{
+  "name": "starpower-poster-bot",
+  "version": "1.0.0",
+  "description": "Automated TikTok poster generator and email sender for creators",
+  "main": "lambdaHandler.js",
+  "scripts": {
+    "start": "node lambdaHandler.js",
+    "dev": "node main.js",
+    "render": "node scripts/renderPoster.js",
+    "generate": "node scripts/generateHtmlPoster.js"
+  },
+  "keywords": ["tiktok", "poster", "automation", "aws-lambda", "puppeteer"],
+  "author": "StarPower Tech Team",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.5.0",
+    "nodemailer": "^6.10.1",
+    "puppeteer": "^24.6.1"
+  }
+}

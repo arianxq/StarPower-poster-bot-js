@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      width: 654px;
+      height: 1116px;
+      margin: 0;
+      background: url("./assets/bg.png") no-repeat center center;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      color: white;
+      position: relative;
+    }
+
+    .title {
+      position: absolute;
+      top: 50px;
+      width: 100%;
+      text-align: center;
+      font-size: 50px; 
+      color: #00d6ff;
+      font-weight: bold;
+    }
+
+    .date-range {
+      position: absolute;
+      top: 125px; 
+      width: 100%;
+      text-align: center;
+      font-size: 30px; 
+      font-weight: 600;
+    }
+
+    .username {
+      position: absolute;
+      top: 180px; 
+      width: 100%;
+      text-align: center;
+      font-size: 33px; 
+      font-weight: bold;
+    }
+
+    .avatar-container {
+      position: absolute;
+      top: 240px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 270px; 
+      height: 270px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #00d6ff, #ff0055); /* blue‑red border */
+      padding: 6px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: white;
+    }
+
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .live-tag {
+      position: absolute;
+      top: 505px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: black;
+      padding: 6px 24px;
+      color: white;
+      font-weight: bold;
+      font-size: 27px; 
+      border-radius: 12px;
+      border: 2px solid;
+      border-image: linear-gradient(to right, #00d6ff, #ff0055) 1;
+      box-shadow: 0 0 10px rgba(255, 90, 241, 0.5);
+    }
+
+    .stat {
+      position: absolute;
+      width: 270px;
+      height: 100px;
+      background: #29e1f4;
+      color: black;
+      border-radius: 20px;
+      text-align: center;
+      padding-top: 15px;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(41, 225, 244, 0.5);
+    }
+
+    .stat .label {
+      font-size: 21px; 
+      margin-bottom: 10px;
+    }
+
+    .stat .value {
+      font-size: 50px; 
+      font-weight: 900;
+    }
+
+    .stat .growth {
+      font-size: 35px;
+      color: rgb(32, 227, 32);
+      margin-top: 10px;
+    }
+
+    .stat1 { top: 580px; left: 50px; }
+    .stat2 { top: 580px; right: 50px; }
+    .stat3 { top: 750px; left: 50px; }
+    .stat4 { top: 750px; right: 50px; }
+
+    .footer {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">MONTHLY REPORT</div>
+  <div class="date-range">${dateRange}</div>
+  <div class="username">@${username}</div>
+
+  <div class="avatar-container">
+    <div class="avatar-inner">
+      <img src="${avatarUrl}" />
+    </div>
+  </div>
+
+  <div class="live-tag">LIVE</div>
+
+  <div class="stat stat1">
+    <div class="label">DIAMONDS</div>
+    <div class="value">${diamonds}</div>
+    <div class="growth" style="color: ${diamondsGrowthColor}">${diamondsGrowthIcon} ${diamondsGrowthVal}</div>
+
+  </div>
+
+  <div class="stat stat2">
+    <div class="label">DIAMONDS FROM MATCH</div>
+    <div class="value">${matchDiamonds}</div>
+    <div class="growth" style="color: ${matchGrowthColor}">${matchGrowthIcon} ${matchGrowthVal}</div>
+  </div>
+
+  <div class="stat stat3">
+    <div class="label">LIVE DURATION</div>
+    <div class="value">${liveHours}</div>
+    <div class="growth" style="color: ${liveGrowthColor}">${liveGrowthIcon} ${liveGrowthVal}</div>
+  </div>
+
+  <div class="stat stat4">
+    <div class="label">NEW FOLLOWERS</div>
+    <div class="value">${newFollowers}</div>
+    <div class="growth" style="color: ${followerGrowthColor}">${followerGrowthIcon} ${followerGrowthVal}</div>
+  </div>
+
+  <div class="footer">*Compared to last month </div>
+</body>
+</html>
