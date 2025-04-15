@@ -87,7 +87,7 @@
 
     .stat {
       position: absolute;
-      width: 280px;
+      width: 270px;
       height: 100px;
       background: #29e1f4;
       color: black;
@@ -99,9 +99,11 @@
     }
 
     .stat .label {
-      font-size: 21px; 
-      margin-bottom: 10px;
+      font-size: 18px;     /* 原来是 21px */
+      letter-spacing: -0.5px;
+      white-space: nowrap; /* 防止换行 */
     }
+
 
     .stat .value {
       font-size: 50px; 
