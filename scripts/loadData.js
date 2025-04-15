@@ -4,11 +4,11 @@ const path = require("path");
 const readline = require("readline");
 require("dotenv").config();
 
-// AWS S3 setup
+// AWS S3 Setup
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION || "ap-southeast-2",
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
 // S3 Keys
@@ -17,13 +17,46 @@ const DATA_KEY = "bot/creator-data/AUNZ-Creatordata-March.csv";
 const RECIPIENT_KEY = "bot/creator-data/Test Recipient list.csv";
 const AVATAR_PREFIX = "bot/creator-avatar/";
 
-// Local paths
+// Local Paths
 const TMP = "/tmp";
 const DATA_PATH = path.join(TMP, "AUNZ-Creatordata-March.csv");
 const RECIPIENT_PATH = path.join(TMP, "Test Recipient list.csv");
 const AVATAR_DIR = path.join(TMP, "avatars");
 
-// Download single S3 file
+// ---------- Utilities ----------
+function clean(str) {
+  if (typeof str !== "string") return "";
+  return str.trim().replace("\uFEFF", "");
+}
+
+function safeGet(row, key) {
+  return (row?.[key] ?? "").trim();
+}
+
+function formatNum(n) {
+  const val = parseFloat(n);
+  return isNaN(val) ? n : val >= 1000 ? (val / 1000).toFixed(2) + "K" : n;
+}
+
+function extractHours(dur) {
+  if (!dur?.includes("h")) return "0";
+  return dur.split("h")[0].trim();
+}
+
+function buildGrowth(raw) {
+  const val = (raw ?? "").trim();
+  if (!val || val === "-" || val === "#N/A" || val === "#DIV/0!") {
+    return { val: "-", icon: "", color: "#999" };
+  }
+  const negative = val.startsWith("-");
+  return {
+    val,
+    icon: negative ? "▼" : "▲",
+    color: negative ? "red" : "rgb(32, 227, 32)",
+  };
+}
+
+// ---------- File Helpers ----------
 function downloadS3File(s3Key, localPath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(localPath);
@@ -35,7 +68,6 @@ function downloadS3File(s3Key, localPath) {
   });
 }
 
-// Download all avatars
 async function downloadAllAvatars() {
   fs.mkdirSync(AVATAR_DIR, { recursive: true });
 
@@ -53,7 +85,6 @@ async function downloadAllAvatars() {
   await Promise.all(downloads);
 }
 
-// Parse recipient CSV like Java (by column index)
 function parseRecipientCsv(filePath) {
   return new Promise((resolve, reject) => {
     const results = [];
@@ -67,7 +98,7 @@ function parseRecipientCsv(filePath) {
     rl.on("line", (line) => {
       if (isFirst) {
         isFirst = false;
-        return; // skip header
+        return;
       }
       const parts = line.split(",", 4);
       const [id, username, email] = parts.map((x) => (x ?? "").trim());
@@ -81,49 +112,24 @@ function parseRecipientCsv(filePath) {
   });
 }
 
-// Parse data CSV using csv-parser
 function parseCsv(filePath) {
   return new Promise((resolve, reject) => {
     const csv = require("csv-parser");
     const results = [];
     fs.createReadStream(filePath)
-      .pipe(csv())
+      .pipe(
+        csv({
+          mapHeaders: ({ header }) => header.replace("\uFEFF", "").trim(), // 解决 BOM 问题
+        })
+      )
       .on("data", (row) => results.push(row))
       .on("end", () => resolve(results))
       .on("error", reject);
   });
 }
 
-// Core utilities
-function clean(str) {
-  if (typeof str !== "string") return "";
-  return str.trim().replace("\uFEFF", "");
-}
-function safeGet(row, key) {
-  return (row?.[key] ?? "").trim();
-}
-function formatNum(n) {
-  const val = parseFloat(n);
-  return isNaN(val) ? n : val >= 1000 ? (val / 1000).toFixed(2) + "K" : n;
-}
-function extractHours(dur) {
-  if (!dur?.includes("h")) return "0";
-  return dur.split("h")[0].trim();
-}
-function buildGrowth(raw) {
-  const val = (raw ?? "").trim();
-  if (!val || val === "-" || val === "#N/A" || val === "#DIV/0!") {
-    return { val: "-", icon: "", color: "#999" };
-  }
-  const negative = val.startsWith("-");
-  return {
-    val,
-    icon: negative ? "▼" : "▲",
-    color: negative ? "red" : "rgb(32, 227, 32)",
-  };
-}
 
-// Match and generate poster data
+// ---------- Data Matcher ----------
 function matchAndBuildPosterData(dataRows, recipients) {
   const dataMap = {};
   dataRows.forEach((row) => {
@@ -151,12 +157,23 @@ function matchAndBuildPosterData(dataRows, recipients) {
       const lg = buildGrowth(safeGet(row, "LIVE duration - Vs. last month"));
       const fg = buildGrowth(safeGet(row, "New followers - Vs. last month"));
 
+      const dateRange = safeGet(row, "Data period");
+      let reportType = "Monthly";
+      if (/^\d{4}-\d{2}-\d{2}\s*~\s*\d{4}-\d{2}-\d{2}$/.test(dateRange)) {
+        const [startStr, endStr] = dateRange.split("~").map((s) => s.trim());
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        const diffDays = (end - start) / (1000 * 60 * 60 * 24) + 1;
+        if (diffDays <= 10) reportType = "Weekly";
+      }
+
       return {
         creatorId: id,
         email,
         username,
         avatarUrl: avatarPath,
-        dateRange: safeGet(row, "Data period"),
+        dateRange,
+        reportType,
         diamonds: formatNum(safeGet(row, "Diamonds")),
         matchDiamonds: formatNum(safeGet(row, "Diamonds from matches")),
         liveHours: extractHours(safeGet(row, "LIVE duration")) + "hrs",
@@ -178,7 +195,7 @@ function matchAndBuildPosterData(dataRows, recipients) {
     .filter(Boolean);
 }
 
-// Main export
+// ---------- Main Entry ----------
 async function loadData() {
   await downloadS3File(DATA_KEY, DATA_PATH);
   await downloadS3File(RECIPIENT_KEY, RECIPIENT_PATH);

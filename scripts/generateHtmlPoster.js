@@ -1,4 +1,3 @@
-// scripts/generateHtmlPoster.js
 const fs = require("fs");
 const path = require("path");
 
@@ -13,6 +12,11 @@ async function generateHtmlPoster(data) {
 
   // 确保 /tmp/render 目录存在（用于 Lambda）
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+  // 添加辅助变量供模板使用
+  data.reportTypeUpper = (data.reportType || "").toUpperCase();
+  data.reportTypeLower = (data.reportType || "").toLowerCase();
+  data.comparisonLabel = data.reportType?.toLowerCase() === "weekly" ? "week" : "month";
 
   // 读取 HTML 模板
   let template = fs.readFileSync(templatePath, "utf-8");

@@ -5,13 +5,15 @@ const AWS = require("aws-sdk");
 // S3 设置（可放在 .env 中或提前配置）
 const BUCKET = process.env.BUCKET_NAME || "starpower-media";
 const AVATAR_PREFIX = "creator-avatar/";
-const AVATAR_DIR = "/tmp/avatars"; // Lambda 中使用 /tmp
+const AVATAR_DIR = "/tmp/avatars"; // 使用 /tmp
 
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION || "ap-southeast-2",
+  // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
-// 下载单个 S3 文件到本地路径
+// 下载所有头像到本地 /tmp/avatars 路径（适用于 Lambda 或本地调试）
 function downloadS3File(s3Key, localPath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(localPath);
@@ -44,7 +46,7 @@ async function downloadAllAvatars() {
   // 下载每一个头像
   const downloads = result.Contents.map((obj) => {
     const key = obj.Key;
-    const filename = path.basename(key); // 例如 12345678.png
+    const filename = path.basename(key); // like 12345678.png
     const localPath = path.join(AVATAR_DIR, filename);
     return downloadS3File(key, localPath);
   });

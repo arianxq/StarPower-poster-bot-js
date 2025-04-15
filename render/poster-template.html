@@ -131,7 +131,7 @@
   </style>
 </head>
 <body>
-  <div class="title">MONTHLY REPORT</div>
+  <div class="title">${reportTypeUpper} REPORT</div>
   <div class="date-range">${dateRange}</div>
   <div class="username">@${username}</div>
 
@@ -168,6 +168,6 @@
     <div class="growth" style="color: ${followerGrowthColor}">${followerGrowthIcon} ${followerGrowthVal}</div>
   </div>
 
-  <div class="footer">*Compared to last month </div>
+  <div class="footer">*Compared to last ${comparisonLabel}</div>
 </body>
 </html>

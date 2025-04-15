@@ -1,4 +1,3 @@
-// scripts/sendEmail.js
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -7,8 +6,9 @@ require("dotenv").config();
  * @param {string} to - 收件人邮箱
  * @param {string} username - Creator 的用户名（用于称呼）
  * @param {string} imagePath - 要附加的 PNG 文件路径
+ * @param {string} reportType - "Weekly" or "Monthly"
  */
-async function sendPosterEmail(to, username, imagePath) {
+async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") {
   const senderEmail = process.env.SENDER_EMAIL;
   const senderPassword = process.env.SENDER_PASSWORD;
 
@@ -27,8 +27,8 @@ async function sendPosterEmail(to, username, imagePath) {
   const mailOptions = {
     from: `"StarPower Media" <${senderEmail}>`,
     to: to,
-    subject: "Your Monthly TikTok Report 🌟",
-    text: `Hi ${username},\n\nHere's your monthly performance poster. Keep it up!\n\n— StarPower Team`,
+    subject: `Your ${reportType} TikTok Report 🌟`,
+    text: `Hey ${username},\n\nHere's your ${reportType.toLowerCase()} performance poster. Please keep it up!\n\n— StarPower Team`,
     attachments: [
       {
         filename: `${username.replace(/[^\w\-]/g, "_")}.png`,
