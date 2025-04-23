@@ -56,6 +56,12 @@ function buildGrowth(raw) {
   };
 }
 
+function getFieldName(base, reportType) {
+  return reportType === "Weekly"
+    ? `${base} - Vs. last week`
+    : `${base} - Vs. last month`;
+}
+
 // ---------- File Helpers ----------
 function downloadS3File(s3Key, localPath) {
   return new Promise((resolve, reject) => {
@@ -128,7 +134,6 @@ function parseCsv(filePath) {
   });
 }
 
-
 // ---------- Data Matcher ----------
 function matchAndBuildPosterData(dataRows, recipients) {
   const dataMap = {};
@@ -152,11 +157,6 @@ function matchAndBuildPosterData(dataRows, recipients) {
 
       const avatarPath = "file://" + path.join(AVATAR_DIR, id + ".png");
 
-      const dg = buildGrowth(safeGet(row, "Diamonds - Vs. last month"));
-      const mg = buildGrowth(safeGet(row, "Diamonds from matches - Vs. last month"));
-      const lg = buildGrowth(safeGet(row, "LIVE duration - Vs. last month"));
-      const fg = buildGrowth(safeGet(row, "New followers - Vs. last month"));
-
       const dateRange = safeGet(row, "Data period");
       let reportType = "Monthly";
       if (/^\d{4}-\d{2}-\d{2}\s*~\s*\d{4}-\d{2}-\d{2}$/.test(dateRange)) {
@@ -166,6 +166,11 @@ function matchAndBuildPosterData(dataRows, recipients) {
         const diffDays = (end - start) / (1000 * 60 * 60 * 24) + 1;
         if (diffDays <= 10) reportType = "Weekly";
       }
+
+      const dg = buildGrowth(safeGet(row, getFieldName("Diamonds", reportType)));
+      const mg = buildGrowth(safeGet(row, getFieldName("Diamonds from matches", reportType)));
+      const lg = buildGrowth(safeGet(row, getFieldName("LIVE duration", reportType)));
+      const fg = buildGrowth(safeGet(row, getFieldName("New followers", reportType)));
 
       return {
         creatorId: id,
