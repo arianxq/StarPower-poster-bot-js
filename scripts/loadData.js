@@ -106,10 +106,10 @@ function parseRecipientCsv(filePath) {
         isFirst = false;
         return;
       }
-      const parts = line.split(",", 4);
-      const [id, username, email] = parts.map((x) => (x ?? "").trim());
+      const parts = line.split(",", 5);  
+      const [id, username, email, language] = parts.map((x) => (x ?? "").trim());
       if (id && email) {
-        results.push({ id, username, email });
+        results.push({ id, username, email, language: (language || "english").toLowerCase() });
       }
     });
 
@@ -117,6 +117,7 @@ function parseRecipientCsv(filePath) {
     rl.on("error", reject);
   });
 }
+
 
 function parseCsv(filePath) {
   return new Promise((resolve, reject) => {
@@ -195,6 +196,7 @@ function matchAndBuildPosterData(dataRows, recipients) {
         followerGrowthVal: fg.val,
         followerGrowthIcon: fg.icon,
         followerGrowthColor: fg.color,
+        language: r.language || "english",
       };
     })
     .filter(Boolean);

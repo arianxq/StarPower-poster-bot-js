@@ -29,7 +29,7 @@ async function runPosterBot() {
       });
 
       // Step 3: Send email with attachment
-      await sendPosterEmail(creator.email, creator.username, outputPath, creator.reportType);
+      await sendPosterEmail(creator.email, creator.username, outputPath, creator.reportType, creator.language);
     } catch (err) {
       console.error(`❌ Error processing ${creator.username}:`, err.message);
     }

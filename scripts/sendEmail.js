@@ -1,14 +1,16 @@
 const nodemailer = require("nodemailer");
+const { language_mapping } = require("./language_mapping");
 require("dotenv").config();
 
 /**
- * 发送海报邮件给某个 Creator
- * @param {string} to - 收件人邮箱
- * @param {string} username - Creator 的用户名（用于称呼）
- * @param {string} imagePath - 要附加的 PNG 文件路径
- * @param {string} reportType - "Weekly" or "Monthly"
+ * 发送海报邮件
+ * @param {string} to
+ * @param {string} username
+ * @param {string} imagePath
+ * @param {string} reportType
+ * @param {string} language
  */
-async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") {
+async function sendPosterEmail(to, username, imagePath, reportType = "Monthly", language = "english") {
   const senderEmail = process.env.SENDER_EMAIL;
   const senderPassword = process.env.SENDER_PASSWORD;
 
@@ -24,20 +26,31 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") 
     },
   });
 
-  const periodWord = reportType.toLowerCase() === "weekly" ? "week" : "month";
+  const langKey = (language || "english").toLowerCase();
+  const langTexts = language_mapping[langKey] || language_mapping["english"];
+
+  const emailBodyTemplate = reportType.toLowerCase() === "weekly"
+    ? langTexts.emailWeekly
+    : langTexts.emailMonthly;
+
+  let emailBody = emailBodyTemplate.replace("${username}", username);
+
+  // 邮件 Subject 根据语言来决定
+  let emailSubject = "";
+  if (langKey === "arabic") {
+    emailSubject = reportType.toLowerCase() === "weekly"
+      ? "تقرير تيك توك الأسبوعي الخاص بك 🌟" // Your Weekly TikTok Report
+      : "تقرير تيك توك الشهري الخاص بك 🌟"; // Your Monthly TikTok Report
+  } else {
+    emailSubject = `Your ${reportType} TikTok Report 🌟`;
+  }
+
+  // 邮件正文还是用纯 text，暂时不加 HTML
   const mailOptions = {
     from: `"StarPower Media" <${senderEmail}>`,
     to: to,
-    subject: `Your ${reportType} TikTok Report 🌟`,
-    text: `Hi ${username},
-  
-  Please see your last ${periodWord}'s performance and progress in the attachment.
-  
-  Keep up the great work. We’re always very proud of you and what you have achieved.
-  
-  If you ever need support or clarification, don’t hesitate to reach out to your manager anytime.
-  
-  StarPower Media Creator Support 🥰`,
+    subject: emailSubject,
+    text: emailBody,
     attachments: [
       {
         filename: `${username.replace(/[^\w\-]/g, "_")}.png`,
@@ -45,10 +58,6 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly") 
       },
     ],
   };
-  
-  
-  
-  
 
   try {
     await transporter.sendMail(mailOptions);
