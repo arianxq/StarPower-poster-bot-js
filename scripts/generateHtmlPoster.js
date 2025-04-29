@@ -3,29 +3,29 @@ const path = require("path");
 const { language_mapping } = require("./language_mapping"); // 导入语言包
 
 /**
- * 替换模板中的 ${key} 变量，生成最终的 HTML
- * @param {Object} data - 一个对象，包含 username、diamonds、avatarUrl 等所有海报需要的变量
- * @returns {string} HTML 输出路径
+ * Replace the ${key} variables in the template to generate the final HTML
+ * @param {Object} data - An object containing all variables needed for the poster, such as username, diamonds, avatarUrl, etc.
+ * @returns {string} The output path of the generated HTML
  */
 async function generateHtmlPoster(data) {
   const templatePath = path.resolve("render/poster-template.html");
   const outputPath = path.resolve(__dirname, "../render/generated.html");
   //const outputPath = path.resolve("render/generated.html");
 
-  // 确保 /tmp/render 目录存在（Lambda环境下需要）
+  // Ensure the /tmp/render directory exists
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
-  // 获取语言包内容（默认为 english）
+  // Get the language texts (default to English)
   const langKey = (data.language || "english").toLowerCase();
   const langTexts = language_mapping[langKey] || language_mapping["english"];
 
-  // 根据 reportType 是 weekly 还是 monthly，动态选择 comparisonLabel
+  // Dynamically select comparisonLabel based on whether reportType is weekly or monthly
   const reportType = (data.reportType || "").toLowerCase();
   const comparisonLabel = reportType === "weekly" ? langTexts.comparisonWeek : langTexts.comparisonMonth;
 
-  // 整合所有需要替换的数据
+  // Merge all data needed for replacement
   const mergedData = {
-    ...data, // 保留原来的 username, diamonds 等
+    ...data, // Keep original username, diamonds, etc.
     reportTitleText: langTexts.reportTitle,
     diamondsLabel: langTexts.diamonds,
     diamondsFromMatchLabel: langTexts.diamondsFromMatch,
@@ -33,20 +33,20 @@ async function generateHtmlPoster(data) {
     newFollowersLabel: langTexts.newFollowers,
     comparedToLastText: langTexts.comparedToLast,
     liveTagText: "LIVE", 
-    comparisonLabel, // 用来动态填 comparedToLastText 后面的 week/month
+    comparisonLabel, // Used to dynamically fill week/month after comparedToLastText
   };
 
-  // 读取 HTML 模板
+  // Read the HTML template
   let template = fs.readFileSync(templatePath, "utf-8");
 
-  // 替换模板中所有 ${key} 占位符
+  // Replace all ${key} placeholders in the template
   for (const [key, value] of Object.entries(mergedData)) {
     const safeValue = value ?? "";
     const regex = new RegExp(`\\$\\{${key}\\}`, "g");
     template = template.replace(regex, safeValue);
   }
 
-  // 写入最终 HTML
+  // Write the final HTML
   fs.writeFileSync(outputPath, template, "utf-8");
   console.log("📝 Generated HTML at:", outputPath);
 

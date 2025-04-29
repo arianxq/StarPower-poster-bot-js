@@ -3,7 +3,7 @@ const { language_mapping } = require("./language_mapping");
 require("dotenv").config();
 
 /**
- * 发送海报邮件
+ * Send poster email
  * @param {string} to
  * @param {string} username
  * @param {string} imagePath
@@ -35,7 +35,7 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly", 
 
   let emailBody = emailBodyTemplate.replace("${username}", username);
 
-  // 邮件 Subject 根据语言来决定
+  // email subject based on language
   let emailSubject = "";
   if (langKey === "arabic") {
     emailSubject = reportType.toLowerCase() === "weekly"
@@ -45,7 +45,7 @@ async function sendPosterEmail(to, username, imagePath, reportType = "Monthly", 
     emailSubject = `Your ${reportType} TikTok Report 🌟`;
   }
 
-  // 邮件正文还是用纯 text，暂时不加 HTML
+  // Use plain text for the email body (no HTML for now)
   const mailOptions = {
     from: `"StarPower Media" <${senderEmail}>`,
     to: to,

@@ -2,10 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const AWS = require("aws-sdk");
 
-// S3 设置（可放在 .env 中或提前配置）
+// S3 configuration (can be placed in .env or pre-configured)
 const BUCKET = process.env.BUCKET_NAME || "starpower-media";
 const AVATAR_PREFIX = "creator-avatar/";
-const AVATAR_DIR = "/tmp/avatars"; // 使用 /tmp
+const AVATAR_DIR = "/tmp/avatars"; // use /tmp
 
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION || "ap-southeast-2",
@@ -13,7 +13,7 @@ const s3 = new AWS.S3({
   // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
-// 下载所有头像到本地 /tmp/avatars 路径（适用于 Lambda 或本地调试）
+// // Download all avatars to the local /tmp/avatars path (suitable for Lambda or local debugging)
 function downloadS3File(s3Key, localPath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(localPath);
@@ -25,9 +25,9 @@ function downloadS3File(s3Key, localPath) {
   });
 }
 
-// 下载所有头像
+// download all avatars
 async function downloadAllAvatars() {
-  // 确保本地目录存在
+  // Ensure the local directory exists
   fs.mkdirSync(AVATAR_DIR, { recursive: true });
 
   const result = await s3
@@ -37,13 +37,13 @@ async function downloadAllAvatars() {
     })
     .promise();
 
-  // 打印调试信息
+  // Log debug information
   console.log("🧾 Avatar files found in S3:", result.Contents.length);
   result.Contents.forEach((obj) => {
     console.log(" -", obj.Key);
   });
 
-  // 下载每一个头像
+  // Download each avatar
   const downloads = result.Contents.map((obj) => {
     const key = obj.Key;
     const filename = path.basename(key); // like 12345678.png

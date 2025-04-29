@@ -13,6 +13,11 @@ async function runPosterBot() {
   console.log(`🎯 Loaded ${creators.length} creators.`);
 
   for (const creator of creators) {
+    // If diamonds is 0 or null, skip
+    if (!creator.diamonds || creator.diamonds === "0" || creator.diamonds === "0.00") {
+      console.log(`⏩ Skipping ${creator.username} due to 0 diamonds`);
+      continue;
+    }
     const safeUsername = creator.username.replace(/[^\w\-]/g, "_");
     const outputFilename = `${safeUsername}.png`;
     const outputPath = path.join("/tmp/output", outputFilename);
