@@ -4,8 +4,8 @@ const { runPosterBot } = require("./scripts/posterService");
 (async () => {
   try {
     await runPosterBot();
-    console.log("✅ 本地测试成功完成！");
+    console.log("✅ Local test completed successfully!");
   } catch (err) {
-    console.error("❌ 本地测试失败：", err.message);
+    console.error("❌ Local test failed:", err.message);
   }
 })();

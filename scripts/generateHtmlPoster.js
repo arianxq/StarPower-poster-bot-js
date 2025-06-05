@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { language_mapping } = require("./language_mapping"); // 导入语言包
+const { language_mapping } = require("./language_mapping"); // Import language pack
 
 /**
  * Replace the ${key} variables in the template to generate the final HTML
